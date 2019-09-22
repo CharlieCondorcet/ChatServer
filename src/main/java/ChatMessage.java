@@ -8,6 +8,44 @@
  *
  */
 
+import java.time.LocalDateTime;
+
 public class ChatMessage {
+
+
+    private final String username;
+    private final String message;
+    private final LocalDateTime timeStamp;
+
+
+
+    public ChatMessage(String username, String message, LocalDateTime timeStamp) {
+        this.username = username;
+        this.message = message;
+        this.timeStamp = timeStamp;
+    }
+
+
+    public LocalDateTime getTimeStamp() {
+        return this.timeStamp;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public String PrintCompleteMessage(){
+        try{
+            return "* "+this.username+ ": "+this.message+" |at: "+this.timeStamp.toString()+" .-";
+
+        }catch (Exception e){
+
+            return " ";
+        }
+    }
 
 }
