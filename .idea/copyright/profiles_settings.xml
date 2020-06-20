@@ -1,3 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="charlie copyrught" />
+  <settings default="gnuv2Copyright">
+    <module2copyright>
+      <element module="All" copyright="gnuv2Copyright" />
+    </module2copyright>
+  </settings>
 </component>

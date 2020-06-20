@@ -1,23 +1,28 @@
 /*
- *  Copyright (c) 2019. Charlie Condorcet http://www.charliec.cl .
+ * Copyright (c) 2020 Charlie Condorcet - Engineering Student.
  *
- *  All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Intellij IDEA
- * which accompanies this distribution, and is available at
- * https://resources.jetbrains.com/storage/products/appcode/docs/AppCode_Classroom_EULA.pdf .
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 import java.time.LocalDateTime;
 
 public class ChatMessage {
 
-
     private final String username;
     private final String message;
     private final LocalDateTime timeStamp;
-
-
 
     public ChatMessage(String username, String message, LocalDateTime timeStamp) {
         this.username = username;
@@ -25,6 +30,15 @@ public class ChatMessage {
         this.timeStamp = timeStamp;
     }
 
+    public String PrintCompleteMessage() {
+        try {
+            return "* " + this.username + ": " + this.message + " |at: " + this.timeStamp.toString() + " .-";
+
+        } catch (Exception e) {
+
+            return " ";
+        }
+    }
 
     public LocalDateTime getTimeStamp() {
         return this.timeStamp;
@@ -36,16 +50,6 @@ public class ChatMessage {
 
     public String getMessage() {
         return this.message;
-    }
-
-    public String PrintCompleteMessage(){
-        try{
-            return "* "+this.username+ ": "+this.message+" |at: "+this.timeStamp.toString()+" .-";
-
-        }catch (Exception e){
-
-            return " ";
-        }
     }
 
 }

@@ -16,5 +16,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-rootProject.name = 'ChatServer'
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
+
+public class htmlTemplate {
+
+    /**
+     * The Logger
+     */
+    private static final Logger log = LoggerFactory.getLogger(ChatServer.class);
+
+
+    public void htmlUI(PrintWriter pw, ArrayList<ChatMessage> messagesInChatRoom) {
+        pw.println("HTTP/1.1 200 OK");
+        pw.println("Server: DSM v0.0.1");
+        pw.println("Date: " + new Date());
+        pw.println("Content-Type: text/html; charset=UTF-8");
+        // pw.println("Content-Type: text/plain; charset=UTF-8");
+        pw.println("<html><body>The Date: <strong>" + new Date() + "</strong><body></html>");
+
+
+
+        pw.flush();
+    }
+
+}

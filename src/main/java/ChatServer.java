@@ -1,12 +1,20 @@
 
 /*
- *  Copyright (c) 2019. Charlie Condorcet http://www.charliec.cl .
+ * Copyright (c) 2020 Charlie Condorcet - Engineering Student.
  *
- *  All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Intellij IDEA
- * which accompanies this distribution, and is available at
- * https://resources.jetbrains.com/storage/products/appcode/docs/AppCode_Classroom_EULA.pdf .
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 
@@ -39,8 +47,7 @@ public class ChatServer {
      */
     private static final int PORT = 9000;
 
-    private static final ArrayList<ChatMessage> MessagesInChatRoom = new ArrayList<>();
-    private static int contMessages = 0;
+    private static ArrayList<ConnectionThread> hilos = new ArrayList<>();
 
     /**
      * The Ppal.
@@ -58,136 +65,27 @@ public class ChatServer {
         // Forever serve.
         while (true) {
 
-            // One socket by request (try with resources).
             try {
 
+                // Process to listen connections.
                 final Socket socket = serverSocket.accept();
 
-                // The remote connection address.
-                final InetAddress address = socket.getInetAddress();
+                // Threads to print web UI.
+                ConnectionThread connectionThread = new ConnectionThread(PORT, serverSocket, socket);
+                connectionThread.start();
 
-                log.debug("========================================================================================");
-                log.debug("Connection from {} in port {}.", address.getHostAddress(), socket.getPort());
+                hilos.add(connectionThread);
 
-                processConnection(socket);
+                log.debug("estado hilo: "+ connectionThread.getState().toString());
 
-            } catch (IOException e) {
-                log.error("Error", e);
+            } catch (Exception e) {
+                log.error("Error not registered: ", e);
                 throw e;
             }
 
+            log.debug("One thread more created.");
+
         }
-
     }
-
-    /**
-     * Process the connection.
-     *
-     * @param socket to use as source of data.
-     */
-    private static void processConnection(final Socket socket) throws IOException {
-
-        // Reading the inputstream
-        final List<String> lines = readInputStreamByLines(socket);
-
-        final String request = lines.get(0);
-        log.debug("Request: {}", request);
-
-        final PrintWriter pw = new PrintWriter(socket.getOutputStream());
-        pw.println("HTTP/1.1 200 OK");
-        pw.println("Server: DSM v0.0.1");
-        pw.println("Date: " + new Date());
-        pw.println("Content-Type: text/html; charset=UTF-8");
-        // pw.println("Content-Type: text/plain; charset=UTF-8");
-        pw.println();
-        //pw.println("<html><body>The Date: <strong>" + new Date() + "</strong><body></html>");
-
-
-        pw.println("<html><body> <h2><font color=\"red\"> CHAT ROOM </font> </h2>  <p>allMessages:</p> ");
-        pw.println("<textarea  readonly cols=\"160\" rows=\"20\" > ");
-
-        for (int i = 0; i < MessagesInChatRoom.size(); i++) {
-            pw.println(MessagesInChatRoom.get(i).PrintCompleteMessage());
-        }
-
-        pw.println("</textarea> <form method=\"POST\"> ");
-        pw.println("<br> <hr> <br> Enter you Name:<input type=\"text\" name=\"myUserName\" style=\"margin-right: 20px\"> ");
-        pw.println("Enter you Message:<input type=\"text\" name=\"myMessage\" size=\"50\" style=\"margin-right: 20px\"> ");
-        pw.println("<input type=\"submit\" name=\"myButton\" value=\"Send to Everybody\"> ");
-        pw.println("</form> <body></html>");
-
-        pw.flush();
-
-        log.debug("Process ended.");
-
-    }
-
-    /**
-     * Read all the input stream.
-     *
-     * @param socket to use to read.
-     * @return all the string readed.
-     */
-    private static List<String> readInputStreamByLines(final Socket socket) throws IOException {
-
-        final InputStream is = socket.getInputStream();
-
-        // The list of string readed from inputstream.
-        final List<String> lines = new ArrayList<>();
-
-        // The Scanner
-        final Scanner s = new Scanner(is).useDelimiter("\\A");
-        log.debug("Reading the Inputstream ..");
-
-        while (true && s.hasNext()) {
-
-            final String line = s.nextLine();
-            // log.debug("Line: [{}].", line);
-
-            if (line.length() == 0) {
-
-                if (lines.get(0).equals("POST / HTTP/1.1")) {
-                    String textByUser = s.nextLine();
-                    FormatForMessage(textByUser);
-                }
-
-                break;
-            } else {
-                lines.add(line);
-            }
-        }
-        // String result = s.hasNext() ? s.next() : "";
-
-        // final List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-        return lines;
-
-    }
-
-
-    public static void FormatForMessage(String completeLine) {
-
-        /**
-         variables para guardar el nombre del nombre del usuario y mensaje del usuario respectivamente.
-         */
-        String nameUser = "", messageUser = "";
-
-        nameUser += completeLine.substring(11, completeLine.indexOf("&myMessage="));
-        messageUser += completeLine.substring(completeLine.indexOf("&myMessage=") + 11, completeLine.indexOf("&myButton="));
-
-        String withoutAccent = Normalizer.normalize(nameUser, Normalizer.Form.NFD);
-        nameUser = withoutAccent.replaceAll("[^a-zA-Z ]", " ");
-
-        withoutAccent = Normalizer.normalize(messageUser, Normalizer.Form.NFD);
-        messageUser = withoutAccent.replaceAll("[^a-zA-Z ]", " ");
-
-        LocalDateTime timeStamp = LocalDateTime.now();
-
-        ChatMessage newMessage = new ChatMessage(nameUser, messageUser, timeStamp);
-        MessagesInChatRoom.add(newMessage);
-        contMessages++;
-
-
-    }
-
 
 }
